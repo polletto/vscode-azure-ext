@@ -12,16 +12,42 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "test.helloWorld",
-        "title": "Hello World"
-      },
-      {
-        "command": "test.apiCall",
-        "title": "Call external API"
+    "configuration": {
+      "title": "azureDevOpsTest configuration",
+      "properties": {
+        "azureDevOpsTest.orgUrl": {
+          "type": "string",
+          "default": ""
+        },
+        "azureDevOpsTest.personalAccessToken": {
+          "type": "string",
+          "default": ""
+        },
+        "azureDevOpsTest.userEmail": {
+          "type": "string",
+          "default": ""
+        }
       }
-    ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "azureDevOpsTest",
+          "title": "azureDevOpsTest",
+          "icon": "$(azure-devops)"
+        }
+      ]
+    },
+    "views": {
+      "azureDevOpsTest": [
+        {
+          "id": "tasksExplorer",
+          "name": "Task Explorer",
+          "type": "tree"
+        }
+      ]
+    },
+    "commands": []
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
