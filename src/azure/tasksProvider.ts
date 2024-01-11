@@ -1,13 +1,28 @@
 import * as vscode from "vscode";
-import * as path from "path";
 import AzureDevOpsManager from "../azure/AzureDevOpsManager";
+import { EventEmitter } from "vscode";
+import { Event } from "vscode";
 
 export class tasksProvider implements vscode.TreeDataProvider<Task> {
-  getTreeItem(element: Task): vscode.TreeItem {
+  static refreshEntries() {
+    throw new Error("Method not implemented.");
+  }
+  private changeEvent = new EventEmitter<void>();
+
+  public get onDidChangeTreeData(): Event<void> {
+    this.getChildren();
+    return this.changeEvent.event;
+  }
+
+  public getTreeItem(element: Task): vscode.TreeItem {
     return element;
   }
 
-  getChildren(element?: Task): Thenable<Task[]> {
+  public refreshEntries(): void {
+    this.changeEvent.fire();
+  }
+
+  public getChildren(element?: Task): Thenable<Task[]> {
     // use azuredevopsmanager to get tasks from azure devops
     const orgUrl = vscode.workspace
       .getConfiguration("azureDevOpsTest")
@@ -75,7 +90,7 @@ class Task extends vscode.TreeItem {
     public readonly command?: vscode.Command
   ) {
     super(label, collapsibleState);
-    this.tooltip = `${this.label}`;
+    this.tooltip = `${this.project}`;
     this.description = description;
     this.project = project;
     this.areaPath = areaPath;

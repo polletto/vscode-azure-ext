@@ -44,10 +44,43 @@
           "id": "tasksExplorer",
           "name": "Task Explorer",
           "type": "tree"
+        },
+        {
+          "id": "taskWebview",
+          "name": "Task description",
+          "type": "webview",
+          "webviewTitle": "Task Webview"
         }
       ]
     },
-    "commands": []
+    "commands": [
+      {
+        "command": "azureDevOpsTest.refreshEntry",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "azureDevOpsTest.testItem",
+        "title": "Test Item",
+        "icon": "$(file-code)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "azureDevOpsTest.refreshEntry",
+          "when": "view == tasksExplorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "azureDevOpsTest.testItem",
+          "when": "view == tasksExplorer && viewItem == task",
+          "group": "inline"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",

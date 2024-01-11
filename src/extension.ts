@@ -3,6 +3,7 @@
 import * as vscode from "vscode";
 import AzureDevOpsManager from "./azure/AzureDevOpsManager";
 import { tasksProvider } from "./azure/tasksProvider";
+import { taskWebViewProvider } from "./providers/taskWebViewProvider";
 
 interface UserData {
   orgUrl: string;
@@ -73,6 +74,7 @@ export async function activate(context: vscode.ExtensionContext) {
   //   vscode.window.showInformationMessage("Hello World from test");
   // });
   // context.subscriptions.push(disposable);
+  const treeDataProvider = new tasksProvider();
   const rootPath =
     vscode.workspace.workspaceFolders &&
     vscode.workspace.workspaceFolders.length > 0
@@ -80,8 +82,29 @@ export async function activate(context: vscode.ExtensionContext) {
       : undefined;
 
   vscode.window.createTreeView("tasksExplorer", {
-    treeDataProvider: new tasksProvider(),
+    treeDataProvider: treeDataProvider,
   });
+  let refreshCommand = vscode.commands.registerCommand(
+    "azureDevOpsTest.refreshEntry",
+    () => {
+      treeDataProvider.refreshEntries();
+      vscode.window.showInformationMessage("Refreshed");
+    }
+  );
+  const webviewprovider = new taskWebViewProvider(context.extensionUri);
+  vscode.window.registerWebviewViewProvider("taskWebview", webviewprovider);
+  let testItemCommand = vscode.commands.registerCommand(
+    "azureDevOpsTest.testItem",
+    (item: any) => {
+      webviewprovider.getHtmlForWebview(item);
+    }
+  );
+  context.subscriptions.push(refreshCommand);
+  context.subscriptions.push(testItemCommand);
+}
+
+function updateWebviewContent(webview: vscode.Webview, item: any) {
+  webview.html = item.description;
 }
 
 export async function createApiCall(
@@ -114,3 +137,6 @@ export async function createApiCall(
 
 // This method is called when your extension is deactivated
 export function deactivate() {}
+function getWebviewContent(item: any): string {
+  throw new Error("Function not implemented.");
+}
