@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import AzureDevOpsManager from "./azure/AzureDevOpsManager";
+import {AzureDevOpsAPI} from "./azure/Azure";
 import { tasksProvider } from "./azure/tasksProvider";
 import { taskWebViewProvider } from "./providers/taskWebViewProvider";
 
@@ -91,7 +91,16 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.window.showInformationMessage("Refreshed");
     }
   );
+  let nextWeekCommand = vscode.commands.registerCommand(
+    "azureDevOpsTest.nextWeek",
+    () => {
+      treeDataProvider.nextWeek();
+      vscode.window.showInformationMessage("Next Week");
+    }
+  );
+  
   const webviewprovider = new taskWebViewProvider(context.extensionUri);
+  
   vscode.window.registerWebviewViewProvider("taskWebview", webviewprovider);
   let testItemCommand = vscode.commands.registerCommand(
     "azureDevOpsTest.testItem",
@@ -99,8 +108,11 @@ export async function activate(context: vscode.ExtensionContext) {
       webviewprovider.getHtmlForWebview(item);
     }
   );
+  vscode.commands.registerCommand('tasksProvider.itemClicked', (item) => {treeDataProvider.itemClicked(item, webviewprovider);});
   context.subscriptions.push(refreshCommand);
   context.subscriptions.push(testItemCommand);
+  context.subscriptions.push(nextWeekCommand);
+  //createApiCall(vscode.workspace.getConfiguration("azureDevOpsTest").get("orgUrl") ?? "", atob(vscode.workspace.getConfiguration("azureDevOpsTest").get("personalAccessToken") ?? "") ?? "", userData.userEmail);
 }
 
 function updateWebviewContent(webview: vscode.Webview, item: any) {
@@ -112,19 +124,24 @@ export async function createApiCall(
   personalAccessToken: string,
   userEmail: string
 ) {
-  const azureDevOpsManager = new AzureDevOpsManager(
-    orgUrl,
-    personalAccessToken
-  );
+  // const azureDevOpsManager = new AzureDevOpsManager(
+  //   orgUrl,
+  //   personalAccessToken
+  // );
 
-  azureDevOpsManager
-    .getAssignedTasks(userEmail)
-    .then((tasks) => {
-      console.log("Assigned Tasks:", tasks);
-    })
-    .catch((err) => {
-      console.error("Error retrieving assigned tasks:", err);
-    });
+  // azureDevOpsManager
+  //   .getAssignedTasks(userEmail)
+  //   .then((tasks) => {
+  //     console.log("Assigned Tasks:", tasks);
+  //   })
+  //   .catch((err) => {
+  //     console.error("Error retrieving assigned tasks:", err);
+  //   });
+  const azureDevOpsManager = new AzureDevOpsAPI(orgUrl,personalAccessToken);
+  azureDevOpsManager.assignedWorkItems("","B2C - Team Delivery","s.rossi@sintraconsulting.eu").then((tasks) => {
+    console.log("Assigned Tasks:", tasks);
+  });
+
 }
 // azureDevOpsManager
 //   .getProjects()
@@ -134,6 +151,7 @@ export async function createApiCall(
 //   .catch((err) => {
 //     console.error("Error retrieving projects:", err);
 //   });
+
 
 // This method is called when your extension is deactivated
 export function deactivate() {}

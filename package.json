@@ -63,12 +63,22 @@
         "command": "azureDevOpsTest.testItem",
         "title": "Test Item",
         "icon": "$(file-code)"
+      },
+      {
+        "command": "azureDevOpsTest.nextWeek",
+        "title": "Next Week",
+        "icon": "$(plus)"
       }
     ],
     "menus": {
       "view/title": [
         {
           "command": "azureDevOpsTest.refreshEntry",
+          "when": "view == tasksExplorer",
+          "group": "navigation"
+        },
+        {
+          "command": "azureDevOpsTest.nextWeek",
           "when": "view == tasksExplorer",
           "group": "navigation"
         }
@@ -103,6 +113,7 @@
   },
   "dependencies": {
     "@types/react": "^18.2.47",
+    "axios": "^1.6.5",
     "azure-devops-node-api": "^12.1.0",
     "react": "^18.2.0"
   }

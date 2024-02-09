@@ -21,7 +21,7 @@ export class taskWebViewProvider implements vscode.WebviewViewProvider {
       localResourceRoots: [this._extensionUri],
     };
   }
-  public getHtmlForWebview(data: any) {
+  public async getHtmlForWebview(data: any) {
     if (this._view) {
       this._view.webview.html = data.description;
     }

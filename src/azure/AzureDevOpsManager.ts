@@ -40,10 +40,10 @@ class AzureDevOpsManager {
   }
 
   async getAssignedTasks(userId: string): Promise<WorkItem[]> {
+    console.log("connection", this._connection);
     try {
-      const workItemTrackingApi =
-        await this._connection.getWorkItemTrackingApi();
-      const query = `SELECT [System.Id], [System.Title], [System.State] FROM workitems WHERE [System.AssignedTo] = '${userId}'`;
+      const workItemTrackingApi = await this._connection.getWorkItemTrackingApi(this._orgUrl);
+      const query = `SELECT [System.Id], [System.Title], [System.State] FROM workitems LIMIT 100`;
       const workItems = await workItemTrackingApi.queryByWiql({ query: query });
 
       if (workItems && workItems.workItems) {
@@ -82,6 +82,7 @@ class AzureDevOpsManager {
     try {
       const coreApi = await this._connection.getCoreApi();
       const projects = await coreApi.getProjects();
+      console.log("projects", projects);
       return projects as unknown as TeamProjectReference[]; // Add type assertion to match the local interface definition
     } catch (error) {
       console.error("Error retrieving projects:", error);
